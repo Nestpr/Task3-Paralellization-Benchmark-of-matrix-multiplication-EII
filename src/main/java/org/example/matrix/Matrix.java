@@ -9,14 +9,4 @@ public class Matrix {
 		}
 		return matrix;
 	}
-
-	public static boolean compareMatrices(double[][] matrixA, double[][] matrixB) {
-		if (matrixA.length != matrixB.length || matrixA[0].length != matrixB[0].length) return false;
-		for (int i = 0; i < matrixA.length; i++) {
-			for (int j = 0; j < matrixA[0].length; j++) {
-				if (Math.abs(matrixA[i][j] - matrixB[i][j]) > 1e-6) return false;
-			}
-		}
-		return true;
-	}
 }

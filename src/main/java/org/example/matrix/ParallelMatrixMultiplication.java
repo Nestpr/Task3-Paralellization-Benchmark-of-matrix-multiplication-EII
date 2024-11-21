@@ -1,29 +1,37 @@
 package org.example.matrix;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
+
 public class ParallelMatrixMultiplication {
 
-	private static final int BLOCK_SIZE = 64;
-	private static final int THRESHOLD = 200; // Threshold for switching to sequential
+	private static final ForkJoinPool SHARED_POOL = new ForkJoinPool(Math.min(Runtime.getRuntime().availableProcessors(), 4));
 
 	public static double[][] multiply(double[][] A, double[][] B) {
 		int n = A.length;
-		if (n < THRESHOLD) {
-			return BasicMatrixMultiplication.multiply(A, B);
-		}
-
 		double[][] result = new double[n][n];
-		ForkJoinPool pool = new ForkJoinPool();
-		pool.invoke(new MatrixMultiplyTask(A, B, result, 0, n, 0, n, 0, n));
+
+		SHARED_POOL.invoke(new MatrixMultiplyTask(A, B, result, 0, n, 0, n, 0, n, getBlockSize(n)));
 		return result;
+	}
+
+	private static int getBlockSize(int matrixSize) {
+		if (matrixSize <= 200) {
+			return 64; // Larger blocks for smaller matrices
+		} else if (matrixSize <= 1000) {
+			return 128; // Moderate blocks for medium matrices
+		} else {
+			return 256; // Larger blocks for very large matrices
+		}
 	}
 
 	private static class MatrixMultiplyTask extends RecursiveTask<Void> {
 		private final double[][] A, B, result;
 		private final int rowStart, rowEnd, colStart, colEnd, kStart, kEnd;
+		private final int blockSize;
 
 		public MatrixMultiplyTask(double[][] A, double[][] B, double[][] result,
-								  int rowStart, int rowEnd, int colStart, int colEnd, int kStart, int kEnd) {
+								  int rowStart, int rowEnd, int colStart, int colEnd,
+								  int kStart, int kEnd, int blockSize) {
 			this.A = A;
 			this.B = B;
 			this.result = result;
@@ -33,6 +41,7 @@ public class ParallelMatrixMultiplication {
 			this.colEnd = colEnd;
 			this.kStart = kStart;
 			this.kEnd = kEnd;
+			this.blockSize = blockSize;
 		}
 
 		@Override
@@ -41,10 +50,10 @@ public class ParallelMatrixMultiplication {
 			int colSize = colEnd - colStart;
 			int kSize = kEnd - kStart;
 
-			if (rowSize <= BLOCK_SIZE && colSize <= BLOCK_SIZE && kSize <= BLOCK_SIZE) {
+			if (rowSize <= blockSize && colSize <= blockSize && kSize <= blockSize) {
 				for (int i = rowStart; i < rowEnd; i++) {
 					for (int j = colStart; j < colEnd; j++) {
-						double sum = 0;
+						double sum = 0.0;
 						for (int k = kStart; k < kEnd; k++) {
 							sum += A[i][k] * B[k][j];
 						}
@@ -59,10 +68,10 @@ public class ParallelMatrixMultiplication {
 			int kMid = (kStart + kEnd) / 2;
 
 			invokeAll(
-					new MatrixMultiplyTask(A, B, result, rowStart, rowMid, colStart, colMid, kStart, kMid),
-					new MatrixMultiplyTask(A, B, result, rowStart, rowMid, colMid, colEnd, kMid, kEnd),
-					new MatrixMultiplyTask(A, B, result, rowMid, rowEnd, colStart, colMid, kMid, kEnd),
-					new MatrixMultiplyTask(A, B, result, rowMid, rowEnd, colMid, colEnd, kStart, kMid)
+					new MatrixMultiplyTask(A, B, result, rowStart, rowMid, colStart, colMid, kStart, kMid, blockSize),
+					new MatrixMultiplyTask(A, B, result, rowStart, rowMid, colMid, colEnd, kMid, kEnd, blockSize),
+					new MatrixMultiplyTask(A, B, result, rowMid, rowEnd, colStart, colMid, kMid, kEnd, blockSize),
+					new MatrixMultiplyTask(A, B, result, rowMid, rowEnd, colMid, colEnd, kStart, kMid, blockSize)
 			);
 
 			return null;

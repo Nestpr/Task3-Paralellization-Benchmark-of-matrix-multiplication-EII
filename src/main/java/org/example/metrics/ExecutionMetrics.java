@@ -11,21 +11,6 @@ public class ExecutionMetrics {
 		this.vectorizedTime = vectorizedTime;
 	}
 
-	// Getter for sequentialTime
-	public double getSequentialTime() {
-		return sequentialTime;
-	}
-
-	// Getter for parallelTime
-	public double getParallelTime() {
-		return parallelTime;
-	}
-
-	// Getter for vectorizedTime
-	public double getVectorizedTime() {
-		return vectorizedTime;
-	}
-
 	// Calculates speedup for parallel execution
 	public double getSpeedupParallel() {
 		return sequentialTime / parallelTime;
