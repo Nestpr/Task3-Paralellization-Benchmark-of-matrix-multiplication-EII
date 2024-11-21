@@ -17,20 +17,16 @@ public class ExecutionTimeRunner {
 				.measurementIterations(3)
 				.build();
 
-		// Run benchmarks and collect results
 		Collection<RunResult> results = new Runner(opt).run();
 
-		// Store execution times by matrix size and type
 		Map<Integer, Double> basicTimes = new HashMap<>();
 		Map<Integer, Double> parallelTimes = new HashMap<>();
 		Map<Integer, Double> vectorizedTimes = new HashMap<>();
 
-		// Parse results
 		for (RunResult result : results) {
 			String benchmarkName = result.getPrimaryResult().getLabel();
-			double time = result.getPrimaryResult().getScore(); // Execution time in milliseconds
+			double time = result.getPrimaryResult().getScore();
 
-			// Extract matrix size from parameters
 			int size = Integer.parseInt(result.getParams().getParam("size"));
 
 			switch (benchmarkName) {
@@ -46,7 +42,6 @@ public class ExecutionTimeRunner {
 			}
 		}
 
-		// Print results and calculate speedups for each size
 		System.out.println("Execution Results by Matrix Size:");
 		System.out.printf("%-10s %-20s %-20s %-20s %-20s %-20s\n",
 				"Size", "Basic Time (ms)", "Parallel Time (ms)", "Vectorized Time (ms)", "Parallel Speedup", "Vectorized Speedup");
@@ -56,11 +51,9 @@ public class ExecutionTimeRunner {
 			double parallelTime = parallelTimes.getOrDefault(size, Double.NaN);
 			double vectorizedTime = vectorizedTimes.getOrDefault(size, Double.NaN);
 
-			// Calculate speedups
 			double parallelSpeedup = !Double.isNaN(parallelTime) && parallelTime > 0 ? basicTime / parallelTime : Double.NaN;
 			double vectorizedSpeedup = !Double.isNaN(vectorizedTime) && vectorizedTime > 0 ? basicTime / vectorizedTime : Double.NaN;
 
-			// Print the results for this matrix size
 			System.out.printf("%-10d %-20.6f %-20.6f %-20.6f %-20.2fx %-20.2fx\n",
 					size, basicTime, parallelTime, vectorizedTime, parallelSpeedup, vectorizedSpeedup);
 		}

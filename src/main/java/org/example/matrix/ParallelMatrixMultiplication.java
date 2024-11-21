@@ -1,7 +1,6 @@
 package org.example.matrix;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
-
 public class ParallelMatrixMultiplication {
 
 	private static final ForkJoinPool SHARED_POOL = new ForkJoinPool(Math.min(Runtime.getRuntime().availableProcessors(), 4));
@@ -16,11 +15,11 @@ public class ParallelMatrixMultiplication {
 
 	private static int getBlockSize(int matrixSize) {
 		if (matrixSize <= 200) {
-			return 64; // Larger blocks for smaller matrices
+			return 64;
 		} else if (matrixSize <= 1000) {
-			return 128; // Moderate blocks for medium matrices
+			return 128;
 		} else {
-			return 256; // Larger blocks for very large matrices
+			return 256;
 		}
 	}
 

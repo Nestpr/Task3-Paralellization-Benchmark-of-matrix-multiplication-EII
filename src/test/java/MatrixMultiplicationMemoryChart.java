@@ -14,47 +14,40 @@ public class MatrixMultiplicationMemoryChart extends JFrame {
 	public MatrixMultiplicationMemoryChart(String title) {
 		super(title);
 
-		// Create dataset
 		XYSeriesCollection dataset = createMemoryUsageDataset();
 
-		// Create the chart
 		JFreeChart chart = ChartFactory.createXYLineChart(
-				"Matrix Multiplication: Memory Usage", // Chart title
-				"Matrix Size (N x N)",               // X-axis label
-				"Memory Usage (MB)",                 // Y-axis label
-				dataset,                             // Dataset
+				"Matrix Multiplication: Memory Usage",
+				"Matrix Size (N x N)",
+				"Memory Usage (MB)",
+				dataset,
 				PlotOrientation.VERTICAL,
-				true,                                // Include legend
+				true,
 				true,
 				false
 		);
 
-		// Customize the plot
 		XYPlot plot = chart.getXYPlot();
 		plot.setDomainGridlinePaint(Color.GRAY);
 		plot.setRangeGridlinePaint(Color.GRAY);
 		plot.setBackgroundPaint(new Color(230, 230, 230));
 
-		// Customize the axes
 		NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
 		domainAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
 		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
 		rangeAxis.setAutoRangeIncludesZero(true);
 
-		// Set chart panel
 		ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new Dimension(1200, 800));
 		setContentPane(chartPanel);
 	}
 
 	private XYSeriesCollection createMemoryUsageDataset() {
-		// Create datasets for Basic, Parallel, and Vectorized memory usage
 		XYSeries basicSeries = new XYSeries("Basic Memory Usage");
 		XYSeries parallelSeries = new XYSeries("Parallel Memory Usage");
 		XYSeries vectorizedSeries = new XYSeries("Vectorized Memory Usage");
 
-		// Data (replace these with actual values)
 		int[] sizes = {10, 50, 100, 200, 500, 1000};
 		double[] basicMemory = {0.04, 0.04, 0.09, 0.34, 2.11, 8.12};
 		double[] parallelMemory = {0.06, 0.04, 0.24, 0.49, 2.16, 8.39};
@@ -66,7 +59,6 @@ public class MatrixMultiplicationMemoryChart extends JFrame {
 			vectorizedSeries.add(sizes[i], vectorizedMemory[i]);
 		}
 
-		// Combine datasets
 		XYSeriesCollection dataset = new XYSeriesCollection();
 		dataset.addSeries(basicSeries);
 		dataset.addSeries(parallelSeries);
