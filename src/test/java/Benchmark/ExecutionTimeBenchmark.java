@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 public class ExecutionTimeBenchmark {
 
-	//TO RUN THIS BENCHMARK, RUN THE EXECUTIONTIMERUNNER CLASS.
 	@Param({"10", "50", "100", "200", "500", "1000"})
 	private int size;
 
